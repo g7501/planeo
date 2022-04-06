@@ -37,6 +37,8 @@ namespace plane
     {
         private readonly DispatcherTimer _timer = new DispatcherTimer();
 
+        Rectangle r;
+
         //bullet counter
         int butlletcount = 0;
         //The player have 7 bullets
@@ -61,9 +63,11 @@ namespace plane
 
             make();
 
-
+            //I have added keyup to make the player move smother
             Window.Current.CoreWindow.KeyDown += KeyEventHandler;
             Window.Current.CoreWindow.KeyUp += KeyEventHandler;
+
+            make();
         }
         //This mothod will call the UpdateKeyState everytime a key got pressed
         private void KeyEventHandler(CoreWindow sender, KeyEventArgs args)
@@ -86,13 +90,13 @@ namespace plane
             {
                 a = false;
             }
-
+            //Key D is Down
             if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.D) &
                  Windows.UI.Core.CoreVirtualKeyStates.Down)
                  == CoreVirtualKeyStates.Down)
             {
-                //D is pressed
                 d = true;
+            //Key D is Up
             }else if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.D) &
                 Windows.UI.Core.CoreVirtualKeyStates.None)
                 == CoreVirtualKeyStates.None)
@@ -100,66 +104,78 @@ namespace plane
                 d = false;
             }
 
-                if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.Space) &
-                 Windows.UI.Core.CoreVirtualKeyStates.Down)
-                 == CoreVirtualKeyStates.Down)
+            //Space is pressed
+            if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.Space) &
+                Windows.UI.Core.CoreVirtualKeyStates.Down)
+                == CoreVirtualKeyStates.Down)
             {
-                //Space is pressed
-                if (Canvas.GetLeft(player) + 80 < 1180)
+                /*
+                SolidColorBrush blue = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 191, 255, 41));
+                Brush red = new SolidColorBrush(Windows.UI.Color.FromArgb(23, 23, 234, 41));
+                r = new Rectangle
                 {
-                    butlletcount++;
-
-                    if(butlletcount == 1)
-                    {
-                        fire0 = true;
-                        bulletPos(bullet0);
-                    }
-
-                    if (butlletcount == 2)
-                    {
-                        fire1 = true;
-                        bulletPos(bullet1);
-                    }
-
-                    if (butlletcount == 3)
-                    {
-                        fire2 = true;
-                        bulletPos(bullet2);
-                    }
-
-                    if (butlletcount == 4)
-                    {
-                        fire3 = true;
-                        bulletPos(bullet3);
-                    }
-
-                    if (butlletcount == 5)
-                    {
-                        fire4 = true;
-                        bulletPos(bullet4);
-                    }
-
-                    if (butlletcount == 6)
-                    {
-                        fire5 = true;
-                        bulletPos(bullet5);
-                    }
-
-                    if (butlletcount == 7)
-                    {
-                        fire6 = true;
-                        bulletPos(bullet6);
-                        butlletcount = 1;
-                    }
-
-                    
-
-                    //I had if butlletcount == 7 do butlletcount = 1;
-                    //I said why I am making a delay just remove it and put it in the last one
-                    //I forgot if  (butlletcount == 6) it should be 7 but I had 2*6 So I had more delay
+                    Tag = "Bullet",
+                    Height = 20,
+                    Width = 5,
+                    Fill = blue,
+                    Stroke = red,
+                };
+                Canvas.SetTop(r, Canvas.GetTop(player) - r.Height);
+                Canvas.SetLeft(r, Canvas.GetLeft(player) + player.Width / 2);
 
 
+                canvas.Children.Add(r);
+
+                fire0 = true;
+                */
+
+                butlletcount++;
+
+                if (butlletcount == 1)
+                {
+                    fire0 = true;
+                    bulletPos(bullet0);
                 }
+
+                if (butlletcount == 2)
+                {
+                    fire1 = true;
+                    bulletPos(bullet1);
+                }
+
+                if (butlletcount == 3)
+                {
+                    fire2 = true;
+                    bulletPos(bullet2);
+                }
+
+                if (butlletcount == 4)
+                {
+                    fire3 = true;
+                    bulletPos(bullet3);
+                }
+
+                if (butlletcount == 5)
+                {
+                    fire4 = true;
+                    bulletPos(bullet4);
+                }
+
+                if (butlletcount == 6)
+                {
+                    fire5 = true;
+                    bulletPos(bullet5);
+                }
+
+                if (butlletcount == 7)
+                {
+                    fire6 = true;
+                    bulletPos(bullet6);
+                    butlletcount = 0;
+                }
+                //I had if butlletcount == 7 do butlletcount = 1;
+                //I said why I am making a delay just remove it and put it in the last one
+                //I forgot if  (butlletcount == 6) it should be 7 but I had 2*6 So I had more delay
 
             }
         }
@@ -169,6 +185,7 @@ namespace plane
             Canvas.SetTop(rec, Canvas.GetTop(player) - rec.Height);
             Canvas.SetLeft(rec, Canvas.GetLeft(player) + player.Width / 2);
         }
+
         //This mehtod will help the bullet move to the top
         private void moveBullet(Windows.UI.Xaml.Shapes.Rectangle rec)
         {
@@ -178,10 +195,10 @@ namespace plane
         // This is the time of the game
         private void Tick(object sender, object e)
         {
+            
             //if fire is true Calling move method
             if (fire0)
             {
-               
                 moveBullet(bullet0);
             }
 
@@ -232,19 +249,52 @@ namespace plane
 
         private void make()
         {
-            Brush red = new SolidColorBrush(Windows.UI.Color.FromArgb(23,23,24,41));
-            Rectangle r;
-            r = new Rectangle();
-            r.Fill = player.Fill;
-            r.Width = 200;
-            r.Height = 200;
+            int left = 800;
 
-            Canvas.SetLeft(r, Canvas.GetLeft(player) - 8);
-            Canvas.SetTop(r, Canvas.GetTop(player) );
+            for (int i = 0; i < 10; i++)
+            {
+                ImageBrush skin = new ImageBrush();
 
+                Rectangle enemy = new Rectangle
+                {
+                    Tag = "enemy",
+                    Height = 45,
+                    Width = 45,
+                    Fill = skin,
+                };
 
+                Canvas.SetTop(enemy, 10);
+                Canvas.SetLeft(enemy, left);
+                
+                canvas.Children.Add(enemy);
+                left -= 60;
+
+                skin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/invader.png"));
+                
+            }
+            left = 800;
+
+            for (int i = 0; i < 10; i++)
+            {
+                ImageBrush skin = new ImageBrush();
+
+                Rectangle enemy = new Rectangle
+                {
+                    Tag = "enemy",
+                    Height = 45,
+                    Width = 45,
+                    Fill = skin,
+                };
+
+                Canvas.SetTop(enemy, 80);
+                Canvas.SetLeft(enemy, left);
+
+                canvas.Children.Add(enemy);
+                left -= 60;
+
+                skin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/invader.png"));
+
+            }
         }
-
-        
     }
 }
