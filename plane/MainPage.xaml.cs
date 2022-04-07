@@ -23,6 +23,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Drawing;
 using Windows.UI.Xaml.Shapes;
 using Rectangle = Windows.UI.Xaml.Shapes.Rectangle;
+using plane.game;
 
 
 
@@ -37,19 +38,10 @@ namespace plane
     {
         private readonly DispatcherTimer _timer = new DispatcherTimer();
 
-        Rectangle r;
-
-        //bullet counter
-        int butlletcount = 0;
-        //The player have 7 bullets
-        bool fire0;
-        bool fire1;
-        bool fire2;
-        bool fire3;
-        bool fire4;
-        bool fire5;
-        bool fire6;
-
+        List<Bullet> bullets = new List<Bullet>();
+        List<Enemy> enemies = new List<Enemy>();
+        Player player;
+        
         bool a;
         bool d;
 
@@ -57,18 +49,35 @@ namespace plane
         {
             this.InitializeComponent();
 
-            _timer.Interval = TimeSpan.FromMilliseconds(10);
-            _timer.Tick += Tick;
-            _timer.Start();
-
-            make();
+            ImageBrush playerSkin = new ImageBrush();
+            playerSkin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/space.png"));
+            player = new Player("player", 80, 80, playerSkin, new SolidColorBrush(Colors.Red));
+            Canvas.SetTop(player.getRectangle(), 760);
+            addGameObject(player);
 
             //I have added keyup to make the player move smother
             Window.Current.CoreWindow.KeyDown += KeyEventHandler;
             Window.Current.CoreWindow.KeyUp += KeyEventHandler;
 
             make();
+
+            _timer.Interval = TimeSpan.FromMilliseconds(0.01666666666);
+            _timer.Tick += Tick;
+            _timer.Start();
+
+
+            
         }
+
+        //
+        private void addGameObject(GameObject gb)
+        {
+            Canvas.SetTop(gb.getRectangle(), Canvas.GetTop(gb.getRectangle()));
+            Canvas.SetLeft(gb.getRectangle(), Canvas.GetLeft(gb.getRectangle()));
+            
+            canvas.Children.Add(gb.getRectangle());
+        }
+
         //This mothod will call the UpdateKeyState everytime a key got pressed
         private void KeyEventHandler(CoreWindow sender, KeyEventArgs args)
         { 
@@ -129,9 +138,17 @@ namespace plane
                 fire0 = true;
                 */
 
-                butlletcount++;
+                Bullet bullet = new Bullet("bullet", 20, 5, new SolidColorBrush(Colors.Red), new SolidColorBrush(Colors.White));
 
-                if (butlletcount == 1)
+                //bullet.setY(player.getY());
+                //bullet.setX(player.getX());
+                bullets.Add(bullet);
+                bulletPos(bullet);
+                addGameObject(bullet);
+
+                //butlletcount++;
+
+               /* if (butlletcount == 1)
                 {
                     fire0 = true;
                     bulletPos(bullet0);
@@ -172,7 +189,7 @@ namespace plane
                     fire6 = true;
                     bulletPos(bullet6);
                     butlletcount = 0;
-                }
+                }*/
                 //I had if butlletcount == 7 do butlletcount = 1;
                 //I said why I am making a delay just remove it and put it in the last one
                 //I forgot if  (butlletcount == 6) it should be 7 but I had 2*6 So I had more delay
@@ -180,10 +197,10 @@ namespace plane
             }
         }
         // This method will help postion the bullet near the player
-        private void bulletPos(Windows.UI.Xaml.Shapes.Rectangle rec)
+        private void bulletPos(Bullet bullet)
         {
-            Canvas.SetTop(rec, Canvas.GetTop(player) - rec.Height);
-            Canvas.SetLeft(rec, Canvas.GetLeft(player) + player.Width / 2);
+            Canvas.SetTop(bullet.getRectangle(), Canvas.GetTop(player.getRectangle()) -bullet.getRectangle().Height);
+            Canvas.SetLeft(bullet.getRectangle(), Canvas.GetLeft(player.getRectangle()) + player.getRectangle().Width / 2);
         }
 
         //This mehtod will help the bullet move to the top
@@ -195,54 +212,55 @@ namespace plane
         // This is the time of the game
         private void Tick(object sender, object e)
         {
-            
-            //if fire is true Calling move method
-            if (fire0)
-            {
-                moveBullet(bullet0);
-            }
+            for (int i = 0; i < bullets.Count; i++)
+                moveBullet(bullets[i].getRectangle());
 
-            if (fire1)
-            {
-                moveBullet(bullet1);
-            }
-
-            if (fire2)
-            {
-                moveBullet(bullet2);
-            }
-
-            if (fire3)
-            {
-                moveBullet(bullet3);
-            }
-
-            if (fire4)
-            {
-                moveBullet(bullet4);
-            }
-
-            if (fire5)
-            {
-                moveBullet(bullet5);
-            }
-
-            if (fire6)
-            {
-                moveBullet(bullet6);
-            }
             // setting the TEXT to bulletcount for montaining
-            txtCount.Text = "count: " + butlletcount;
+           // txtCount.Text = "count: " + butlletcount;
 
             //Player movement
-            if (a && Canvas.GetLeft(player) > 20)
+            if (a && Canvas.GetLeft(player.getRectangle()) > 20)
             {
-                Canvas.SetLeft(player, Canvas.GetLeft(player) - 8);
+                Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) - 8);
             }
 
-            if (d && Canvas.GetLeft(player) + 80 < 1180)
+            if (d && Canvas.GetLeft(player.getRectangle()) + 80 < 1180)
             {
-                Canvas.SetLeft(player, Canvas.GetLeft(player) + 8);
+                Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) + 8);
+            }
+
+            //Ememies interaction
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                for (int y = 0; y < enemies.Count; y++)
+                {
+                        if (checkCollision(bullets[i].getRectangle(), enemies[y].getRectangle()))
+                        {
+                            canvas.Children.Remove(enemies[y].getRectangle());
+                            canvas.Children.Remove(bullets[i].getRectangle());
+                            enemies.RemoveAt(y);
+                            bullets.RemoveAt(i);
+
+                        return;
+                        }
+                }
+                //Removing the bullet at the end of the screen
+                if (Canvas.GetTop(bullets[i].getRectangle()) < 0) 
+                {
+                    canvas.Children.Remove(bullets[i].getRectangle());
+                    bullets.RemoveAt(i);
+                }
+            }
+            float plus = 5;
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                double y = Canvas.GetLeft(enemies[i].getRectangle());
+                Canvas.SetLeft(enemies[i].getRectangle(), y + plus);
+
+                if(y + plus > 1200 - enemies[i].getRectangle().ActualWidth) {
+                    Canvas.SetLeft(enemies[i].getRectangle(), 0);
+                    Canvas.SetTop(enemies[i].getRectangle(), Canvas.GetTop(enemies[i].getRectangle()) + enemies[i].getRectangle().ActualHeight);
+                }
             }
 
         }
@@ -254,47 +272,41 @@ namespace plane
             for (int i = 0; i < 10; i++)
             {
                 ImageBrush skin = new ImageBrush();
+                skin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/invader.png"));
 
-                Rectangle enemy = new Rectangle
+                /*Rectangle enemy = new Rectangle
                 {
                     Tag = "enemy",
                     Height = 45,
                     Width = 45,
                     Fill = skin,
-                };
+                };*/
 
-                Canvas.SetTop(enemy, 10);
-                Canvas.SetLeft(enemy, left);
+                Enemy enemy = new Enemy("enemy", 45, 45, skin, new SolidColorBrush(Colors.White));
+                enemies.Add(enemy);
+
+                Canvas.SetTop(enemy.getRectangle(), 10);
+                Canvas.SetLeft(enemy.getRectangle(), left);
                 
-                canvas.Children.Add(enemy);
+                canvas.Children.Add(enemy.getRectangle());
+
                 left -= 60;
 
-                skin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/invader.png"));
-                
             }
-            left = 800;
 
-            for (int i = 0; i < 10; i++)
-            {
-                ImageBrush skin = new ImageBrush();
+            
+        }
 
-                Rectangle enemy = new Rectangle
-                {
-                    Tag = "enemy",
-                    Height = 45,
-                    Width = 45,
-                    Fill = skin,
-                };
-
-                Canvas.SetTop(enemy, 80);
-                Canvas.SetLeft(enemy, left);
-
-                canvas.Children.Add(enemy);
-                left -= 60;
-
-                skin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/invader.png"));
-
-            }
+        public static bool checkCollision(Rectangle e1, Rectangle e2)
+        {
+            var r1 = e1.ActualWidth / 2;
+            var x1 = Canvas.GetLeft(e1) + r1;
+            var y1 = Canvas.GetTop(e1) + r1;
+            var r2 = e2.ActualWidth / 2;
+            var x2 = Canvas.GetLeft(e2) + r2;
+            var y2 = Canvas.GetTop(e2) + r2;
+            var d = new Vector2((float)(x2 - x1), (float)(y2 - y1));
+            return d.Length() <= r1 + r2;
         }
     }
 }

@@ -10,11 +10,7 @@
 
     <Canvas x:Name="canvas">
         <TextBlock Text="Count: 9" Name="txtCount" FontSize="55"></TextBlock>
-        <Rectangle Name="player" Height="70" Width="70" Canvas.Left="715" Canvas.Top="819" RenderTransformOrigin="0.4,-0.729">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="/Assets/space.png"/>
-            </Rectangle.Fill>
-        </Rectangle>
+        
 
         <Rectangle x:Name="bullet0" Fill="Red" Width="5" Height="10"></Rectangle>
         <Rectangle x:Name="bullet1" Fill="Red" Width="5" Height="10"></Rectangle>

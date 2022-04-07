@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Media;
 
 namespace plane.game
 {
-    internal class Player
+    internal class Player : GameObject
     {
         byte health;
         byte speed;
         byte bullet;
+
+        public Player(string tag, float height, float width, Brush fillColor, SolidColorBrush strokeColor) : base(tag, height, width, fillColor, strokeColor)
+        {
+        }
     }
 }
