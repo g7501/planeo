@@ -44,31 +44,30 @@ namespace plane
         List<Bullet> enemyBullets = new List<Bullet>();
         Player player;
 
-        Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch;
 
         bool a;
         bool d;
-        bool fire;
+
+        bool startGame;
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            ImageBrush playerSkin = new ImageBrush();
-            playerSkin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/space.png"));
-            player = new Player("player", 80, 80, playerSkin, new SolidColorBrush(Colors.Black));
-            Canvas.SetTop(player.getRectangle(), 760);
-            addGameObject(player);
+            
 
             //I have added keyup to make the player move smother
             Window.Current.CoreWindow.KeyDown += KeyEventHandler;
             Window.Current.CoreWindow.KeyUp += KeyEventHandler;
 
-            make();
+            //make();
+            spon();
 
             _timer.Interval = TimeSpan.FromMilliseconds(0.01666666666);
             _timer.Tick += Tick;
-            _timer.Start();            
+            _timer.Start();
+            
         }
         //
         private void addGameObject(GameObject gb)
@@ -87,6 +86,14 @@ namespace plane
         //This mothod have all keys
         private void UpdateKeyState()
         {
+            //if enter is pressed
+            if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.Enter) &
+                 Windows.UI.Core.CoreVirtualKeyStates.Down)
+                 == CoreVirtualKeyStates.Down)
+            {
+                startGame = true;
+            }
+
             //Key A is down
             if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.A) &
                  Windows.UI.Core.CoreVirtualKeyStates.Down)
@@ -170,6 +177,10 @@ namespace plane
         // This is the time of the game
         private void Tick(object sender, object e)
         {
+            //if this boolean is false don't start the game
+            if (!startGame)
+                return;
+
             //Calling method move to move the bullet to the top
             for (int i = 0; i < bullets.Count; i++)
                 moveBullet(bullets[i].getRectangle());
@@ -193,7 +204,7 @@ namespace plane
                 Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) + 8);
             }
 
-            //Ememies interaction
+            //Ememies interaction with player bullet
             for (int i = 0; i < bullets.Count; i++)
             {
                 for (int y = 0; y < enemies.Count; y++)
@@ -216,6 +227,41 @@ namespace plane
                 }
             }
 
+            //enemies bullet interatction
+            for (int i = 0; i < enemyBullets.Count; i++)
+            {
+                /*if (player == null)
+                {
+                    return;
+                }*/
+
+                // Removimg the enemy & the bullet on the collison
+                if (checkCollision(enemyBullets[i].getRectangle(), player.getRectangle()))
+                {
+                    canvas.Children.Remove(enemyBullets[i].getRectangle());
+                    canvas.Children.Remove(player.getRectangle());
+
+                    //To remove the player from the game I need to destroy the boject
+                   
+                    startGame = false;
+
+                    enemyBullets.RemoveAt(i);
+
+                    clear();
+                    spon();
+                    return;
+                }
+                
+                //Removing the bullet at the end of the screen
+                if (Canvas.GetTop(enemyBullets[i].getRectangle()) > 800)
+                {
+                    canvas.Children.Remove(enemyBullets[i].getRectangle());
+                    enemyBullets.RemoveAt(i);
+                }
+            }
+
+
+
             //Move the enemy to the right and appear from the left. + go down at the end of the rotation
             float plus = 5;
             for (int i = 0; i < enemies.Count; i++)
@@ -231,31 +277,38 @@ namespace plane
 
             //Time to make the enemy shoot
             stopwatch.Start();
-            if(stopwatch.ElapsedMilliseconds < 2000)
-            {
-                
-
-                //Canvas.GetLeft(enemies[0].getRectangle());
-                txtCount.Text = "Time: " + stopwatch.ElapsedMilliseconds;
-
-            }
-
-            if (stopwatch.ElapsedMilliseconds > 6000)
+            if (stopwatch.ElapsedMilliseconds > 500)
             {
                 Bullet enemyBullet = new Bullet("enemy_bullet", 20, 5, new SolidColorBrush(Colors.White), new SolidColorBrush(Colors.Red));
-                txtCount.Text = "Time2: " + stopwatch.ElapsedMilliseconds;
-                bulletPos(enemyBullet, enemies[1].getRectangle());
-                enemyBullets.Add(enemyBullet);
-                addGameObject(enemyBullet);
-                stopwatch.Restart();
+                
+
+                Random rnd = new Random();
+                int random = rnd.Next(0, enemies.Count);
+
+                txtCount.Text = "random: " + random;
+
+                if (random < enemies.Count)
+                {
+                    bulletPos(enemyBullet, enemies[random].getRectangle());
+                    enemyBullets.Add(enemyBullet);
+                    addGameObject(enemyBullet);
+                    stopwatch.Restart();
+                }
             }
 
 
         }
 
         // Making the enemy
-        private void make()
+        private void spon()
         {
+            stopwatch = new Stopwatch();
+            ImageBrush playerSkin = new ImageBrush();
+            playerSkin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/space.png"));
+            player = new Player("player", 80, 80, playerSkin, new SolidColorBrush(Colors.Black));
+            Canvas.SetTop(player.getRectangle(), 760);
+            addGameObject(player);
+
             int left = 800;
 
             for (int i = 0; i < 10; i++)
@@ -283,6 +336,19 @@ namespace plane
 
             }
         }
+
+        //Clear everything
+        // I had a problem when I restart the game and not clean the objects (Hiden objects and reandom restarts...ect)
+        private void clear() 
+        {
+            canvas.Children.Clear();
+            stopwatch = null;
+            player = null;
+            enemies.Clear();
+            enemyBullets.Clear();
+            bullets.Clear();
+        }
+
         //Check if there is a collision
         public static bool checkCollision(Rectangle e1, Rectangle e2)
         {

@@ -10,19 +10,5 @@
 
     <Canvas x:Name="canvas">
         <TextBlock Text="Count: 9" Name="txtCount" FontSize="55"></TextBlock>
-        
-
-        <Rectangle x:Name="bullet0" Fill="Red" Width="5" Height="10"></Rectangle>
-        <Rectangle x:Name="bullet1" Fill="Red" Width="5" Height="10"></Rectangle>
-        <Rectangle x:Name="bullet2" Fill="Red" Width="5" Height="10"></Rectangle>
-        <Rectangle x:Name="bullet3" Fill="Red" Width="5" Height="10"></Rectangle>
-        <Rectangle x:Name="bullet4" Fill="Red" Width="5" Height="10"></Rectangle>
-        <Rectangle x:Name="bullet5" Fill="Red" Width="5" Height="10"></Rectangle>
-        <Rectangle x:Name="bullet6" Fill="Red" Width="5" Height="10"></Rectangle>
-        
-        
-
-
-    
     </Canvas>
 </Page>
