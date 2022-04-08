@@ -45,9 +45,12 @@ namespace plane
         Player player;
 
         Stopwatch stopwatch;
-
+        //Keys 'A' and 'D'
         bool a;
         bool d;
+        // Move the enemies to to left/right
+        bool moveDirection = true, moveDown;
+        float plus = 5;
 
         bool startGame;
 
@@ -263,16 +266,44 @@ namespace plane
 
 
             //Move the enemy to the right and appear from the left. + go down at the end of the rotation
-            float plus = 5;
             for (int i = 0; i < enemies.Count; i++)
-            {
-                double y = Canvas.GetLeft(enemies[i].getRectangle());
-                Canvas.SetLeft(enemies[i].getRectangle(), y + plus);
+            {   
+                double x = Canvas.GetLeft(enemies[i].getRectangle());
 
-                if(y + plus > 1200 - enemies[i].getRectangle().ActualWidth) {
+                if (moveDirection)
+                {
+                    if (i == 0 && x > 1000)
+                    {
+                        moveDirection = !moveDirection;
+                        plus = -plus;
+                        moveDown = true;
+                    }
+                }
+
+                Canvas.SetLeft(enemies[i].getRectangle(), x + plus);
+
+                if(!moveDirection)
+                {
+                    if (i == enemies.Count - 1 && x < 200)
+                    {
+                        plus = -plus;
+                        moveDirection = !moveDirection;
+                    }
+                }
+
+                if(moveDown) {
+                    Canvas.SetTop(enemies[i].getRectangle(), Canvas.GetTop(enemies[i].getRectangle()) + 5);
+                }
+
+                if(i == enemies.Count - 1) {
+                    moveDown = false;
+                }
+
+
+                /*if(y + plus > 1200 - enemies[i].getRectangle().ActualWidth) {
                     Canvas.SetLeft(enemies[i].getRectangle(), 0);
                     Canvas.SetTop(enemies[i].getRectangle(), Canvas.GetTop(enemies[i].getRectangle()) + enemies[i].getRectangle().ActualHeight);
-                }
+                }*/
             }
 
             //Time to make the enemy shoot
@@ -285,7 +316,7 @@ namespace plane
                 Random rnd = new Random();
                 int random = rnd.Next(0, enemies.Count);
 
-                txtCount.Text = "random: " + random;
+                //txtCount.Text = "random: " + random;
 
                 if (random < enemies.Count)
                 {
