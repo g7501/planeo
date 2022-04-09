@@ -43,7 +43,7 @@ namespace plane
         List<Enemy> enemies = new List<Enemy>();
         List<Bullet> enemyBullets = new List<Bullet>();
         Player player;
-
+        TextBlock txtScore;
         Stopwatch stopwatch;
         //Keys 'A' and 'D'
         bool a;
@@ -51,9 +51,11 @@ namespace plane
         // Move the enemies to to left/right
         bool moveDirection = true, moveDown;
         //Enemies speed
-        float plus = 1;
+        float plus = 2;
         //Start/pause game
         bool startGame;
+        //Score of the game
+        int score = 0;
 
 
         // Problems
@@ -76,6 +78,8 @@ namespace plane
         6- If the player shoot a lost of bullets the game will start lagging because the bullet will keep
             going off screen.
             The soloution for this destroying the object form the game when it tach the edge of the schreen.
+        - I had a problem with the text. When I restart the game the text box will be removed. This is because I am clearing the canvas canvas.children.clear
+            -> The sloluotion for this will be removing it form XAML and make a new object form the code
             
         Problems not solved yet
             -Enemy spawn
@@ -205,13 +209,13 @@ namespace plane
         //This mehtod will help the bullet move to the top
         private void moveBullet(Rectangle rec)
         {
-            Canvas.SetTop(rec, Canvas.GetTop(rec) - 10);
+            Canvas.SetTop(rec, Canvas.GetTop(rec) - player.getSpeed());
         }
 
         //THis mothod will help the ememy bullet move toword the player
         private void moveEnemyBullet(Rectangle rec)
         {
-            Canvas.SetTop(rec, Canvas.GetTop(rec) + 10);
+            Canvas.SetTop(rec, Canvas.GetTop(rec) + player.getSpeed());
         }
 
         // This is the time of the game
@@ -236,12 +240,12 @@ namespace plane
             //Player movement
             if (a && Canvas.GetLeft(player.getRectangle()) > 20)
             {
-                Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) - 8);
+                Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) - player.getSpeed());
             }
 
             if (d && Canvas.GetLeft(player.getRectangle()) + 80 < 1180)
             {
-                Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) + 8);
+                Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) + player.getSpeed());
             }
 
             //Ememies interaction with player bullet
@@ -255,6 +259,9 @@ namespace plane
                             canvas.Children.Remove(bullets[i].getRectangle());
                             enemies.RemoveAt(y);
                             bullets.RemoveAt(i);
+                            score += 10;
+
+                        txtScore.Text = "SCORE " + score;
 
                         return;
                         }
@@ -376,6 +383,15 @@ namespace plane
             player = new Player("player", 80, 80, playerSkin, new SolidColorBrush(Colors.Black));
             Canvas.SetTop(player.getRectangle(), 760);
             addGameObject(player);
+            txtScore = new TextBlock();
+
+            Canvas.SetLeft(txtScore,20);
+            Canvas.SetTop(txtScore,20);
+            canvas.Children.Add(txtScore);
+
+            txtScore.Text = "SCORE ";
+            txtScore.FontSize = 30;
+            
 
             int left = 800;
 
@@ -411,10 +427,12 @@ namespace plane
         {
             canvas.Children.Clear();
             stopwatch = null;
+            txtScore = null;
             player = null;
             enemies.Clear();
             enemyBullets.Clear();
             bullets.Clear();
+            score = 0;
         }
 
         //Check if there is a collision

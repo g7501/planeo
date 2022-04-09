@@ -14,6 +14,7 @@ namespace plane.game
     class GameObject
     {
         protected Rectangle r = new Rectangle();
+        protected byte speed = 5;
         
         public GameObject(string tag, float height, float width, Brush fillColor, SolidColorBrush strokeColor) 
         {
@@ -30,6 +31,11 @@ namespace plane.game
         public Rectangle getRectangle()
         {
             return r;
+        }
+
+        public byte getSpeed()
+        {
+            return speed;
         }
     }
 }

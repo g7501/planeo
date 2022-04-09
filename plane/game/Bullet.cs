@@ -8,9 +8,10 @@ using Windows.UI.Xaml.Media;
 namespace plane.game
 {
     class Bullet : GameObject {
+        
         public Bullet(string tag, float height, float width, Brush fillColor, SolidColorBrush strokeColor) : base(tag, height, width, fillColor, strokeColor)
         {
-            
+    
         }
     }
 }

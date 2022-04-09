@@ -9,6 +9,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Canvas x:Name="canvas">
-        <TextBlock Text="Count: 9" Name="txtCount" FontSize="55"></TextBlock>
+        
     </Canvas>
 </Page>
