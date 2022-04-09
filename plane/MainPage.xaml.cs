@@ -50,15 +50,37 @@ namespace plane
         bool d;
         // Move the enemies to to left/right
         bool moveDirection = true, moveDown;
-        float plus = 5;
-
+        //Enemies speed
+        float plus = 1;
+        //Start/pause game
         bool startGame;
 
+
+        // Problems
+        /*
+         0- I spent 3 days just to find out how to use onKey up/down.
+         1- I had the player movment inside the on key press which is making the player movement glichy
+            -> TO solve this I made a bool and move the player inside the tick
+            I had another problem with the movments is when the user presses 'A' the player will move to the
+            left and will not stop till another key is pressed.
+            -> To solve this one I had to call the class onKeyUp not only onKeyDown
+         2- Making bullet for the player, first I made 7 bullets in the XAML and use them when the user 
+            press space, but this have a lot of dropbacks. I tried to make an object form the code it
+            took me so much time to make one bucause apperntlly thier was 2 classes to import in the same
+            object and I was using the wrong one.
+        3- I had problem with positioning the emeies and move them around
+        4- The code was too missy and I had to orgnise it.
+        5- I had a problem with reset the game. When I reset the game the object will be hidden
+            So, they are still there but invisable.
+            -> The solution for that is I made another class to clear the objects not only the canvas.
+        6- If the player shoot a lost of bullets the game will start lagging because the bullet will keep
+            going off screen.
+            The soloution for this destroying the object form the game when it tach the edge of the schreen.
+
+         */
         public MainPage()
         {
             this.InitializeComponent();
-
-            
 
             //I have added keyup to make the player move smother
             Window.Current.CoreWindow.KeyDown += KeyEventHandler;
