@@ -76,7 +76,22 @@ namespace plane
         6- If the player shoot a lost of bullets the game will start lagging because the bullet will keep
             going off screen.
             The soloution for this destroying the object form the game when it tach the edge of the schreen.
-
+            
+        Problems not solved yet
+            -Enemy spawn
+            -When all enemies destried nothing happen
+            -No message dissplay
+            -Player can bullets are overpowerd need to put a cooldown
+            -Maybe add another life for the player
+            -No music/sound
+       
+        Good
+            Bullets shape and colours
+            player/enemy skins
+            60 FPS. The game is smooth
+            
+            
+            
          */
         public MainPage()
         {
