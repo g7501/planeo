@@ -98,7 +98,7 @@ namespace plane
             -Sometimes the enemies will go off svreen when the user kill some of them.
        
         Good
-            Bullets shape and colours
+            Bullets shape and colourss
             player/enemy skins
             60 FPS. The game is smooth
 
