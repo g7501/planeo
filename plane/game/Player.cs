@@ -9,10 +9,11 @@ namespace plane.game
 {
     internal class Player : GameObject
     {
+        byte lifes;
         public Player(string tag, float height, float width, Brush fillColor, SolidColorBrush strokeColor) : base(tag, height, width, fillColor, strokeColor)
         {
         }
 
-        
+        public byte Lifes { get => lifes; set => lifes = value; }
     }
 }

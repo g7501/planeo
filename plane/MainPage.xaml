@@ -11,4 +11,5 @@
     <Canvas x:Name="canvas">
         
     </Canvas>
+  
 </Page>

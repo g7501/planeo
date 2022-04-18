@@ -44,18 +44,23 @@ namespace plane
         List<Bullet> enemyBullets = new List<Bullet>();
         Player player;
         TextBlock txtScore;
+        TextBlock txtLife;
+        //Cooldown for enemy bullets
         Stopwatch stopwatch;
-        //Keys 'A' and 'D'
+        //Cooldown for the player
+        Stopwatch playerStopWatch;
+        //Keys 'A' and 'D' The player movment
         bool a;
         bool d;
         // Move the enemies to to left/right
         bool moveDirection = true, moveDown;
         //Enemies speed
-        float plus = 2;
+        double plus = 0.3;
         //Start/pause game
         bool startGame;
         //Score of the game
         int score = 0;
+        
 
 
         // Problems
@@ -80,22 +85,25 @@ namespace plane
             The soloution for this destroying the object form the game when it tach the edge of the schreen.
         - I had a problem with the text. When I restart the game the text box will be removed. This is because I am clearing the canvas canvas.children.clear
             -> The sloluotion for this will be removing it form XAML and make a new object form the code
+        - I had a prblem with makeing a new line of enemies because I had if (i % 10 == 1) and it should be (i % 10 == 0)
+
             
         Problems not solved yet
-            -Enemy spawn
-            -When all enemies destried nothing happen
-            -No message dissplay
-            -Player can bullets are overpowerd need to put a cooldown
-            -Maybe add another life for the player
-            -No music/sound
+            -Enemy spawn.
+            -When all enemies destried nothing happen.
+            -No message dissplay.
+            -Player can bullets are overpowerd need to put a cooldown.
+            -Maybe add another life for the player.
+            -No music/sound.
+            -Sometimes the enemies will go off svreen when the user kill some of them.
        
         Good
             Bullets shape and colours
             player/enemy skins
             60 FPS. The game is smooth
-            
-            
-            
+
+        Working
+            I am working on orgnise the code
          */
         public MainPage()
         {
@@ -107,13 +115,12 @@ namespace plane
 
             //make();
             spon();
-
+            // 60 FPS (60/1)
             _timer.Interval = TimeSpan.FromMilliseconds(0.01666666666);
             _timer.Tick += Tick;
             _timer.Start();
-            
         }
-        //
+        // Add objects to the canvase
         private void addGameObject(GameObject gb)
         {
             Canvas.SetTop(gb.getRectangle(), Canvas.GetTop(gb.getRectangle()));
@@ -136,6 +143,7 @@ namespace plane
                  == CoreVirtualKeyStates.Down)
             {
                 startGame = true;
+                
             }
 
             //Key A is down
@@ -157,8 +165,19 @@ namespace plane
                  == CoreVirtualKeyStates.Down)
             {
                 d = true;
-            //Key D is Up
-            }else if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.D) &
+
+                ContentDialog noWifiDialog = new ContentDialog()
+                {
+                    Title = "No wifi connection",
+                    Content = "Check connection and try again.",
+                    CloseButtonText = "Ok"
+                };
+
+                canvas.Children.Add(noWifiDialog);
+
+                //Key D is Up
+            }
+            else if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.D) &
                 Windows.UI.Core.CoreVirtualKeyStates.None)
                 == CoreVirtualKeyStates.None)
             {
@@ -170,33 +189,16 @@ namespace plane
                 Windows.UI.Core.CoreVirtualKeyStates.Down)
                 == CoreVirtualKeyStates.Down)
             {
-                /*
-                SolidColorBrush blue = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 191, 255, 41));
-                Brush red = new SolidColorBrush(Windows.UI.Color.FromArgb(23, 23, 234, 41));
-                r = new Rectangle
+                if (playerStopWatch.ElapsedMilliseconds > 170)
                 {
-                    Tag = "Bullet",
-                    Height = 20,
-                    Width = 5,
-                    Fill = blue,
-                    Stroke = red,
-                };
-                Canvas.SetTop(r, Canvas.GetTop(player) - r.Height);
-                Canvas.SetLeft(r, Canvas.GetLeft(player) + player.Width / 2);
 
+                    Bullet bullet = new Bullet("bullet", 20, 5, new SolidColorBrush(Colors.White), new SolidColorBrush(Colors.Blue));
 
-                canvas.Children.Add(r);
-
-                fire0 = true;
-                */
-
-                Bullet bullet = new Bullet("bullet", 20, 5, new SolidColorBrush(Colors.White), new SolidColorBrush(Colors.Blue));
-
-                //bullet.setY(player.getY());
-                //bullet.setX(player.getX());
-                bullets.Add(bullet);
-                bulletPos(bullet, player.getRectangle());
-                addGameObject(bullet);  
+                    bullets.Add(bullet);
+                    bulletPos(bullet, player.getRectangle());
+                    addGameObject(bullet);
+                    playerStopWatch.Restart();
+                }
             }
         }
         // This method will help postion the bullet near the player
@@ -225,14 +227,14 @@ namespace plane
             if (!startGame)
                 return;
 
-            //Calling method move to move the bullet to the top
+
+            // moving the player bullet to the top
             for (int i = 0; i < bullets.Count; i++)
                 moveBullet(bullets[i].getRectangle());
 
+            //// moving the enemy bullet to the bottom
             for (int i = 0; i < enemyBullets.Count; i++)
-            {
                 moveEnemyBullet(enemyBullets[i].getRectangle());
-            }
 
             // setting the TEXT to bulletcount for montaining
            // txtCount.Text = "count: " + butlletcount;
@@ -261,7 +263,7 @@ namespace plane
                             bullets.RemoveAt(i);
                             score += 10;
 
-                        txtScore.Text = "SCORE " + score;
+                            txtScore.Text = "SCORE " + score;
 
                         return;
                         }
@@ -274,28 +276,30 @@ namespace plane
                 }
             }
 
-            //enemies bullet interatction
+            //Player interatction -> removing the player and the enemy bullet
             for (int i = 0; i < enemyBullets.Count; i++)
             {
-                /*if (player == null)
-                {
-                    return;
-                }*/
-
-                // Removimg the enemy & the bullet on the collison
+                // Removimg the player & the bullet on the collison (I made this because if the player have more lifes...)
                 if (checkCollision(enemyBullets[i].getRectangle(), player.getRectangle()))
                 {
                     canvas.Children.Remove(enemyBullets[i].getRectangle());
-                    canvas.Children.Remove(player.getRectangle());
-
-                    //To remove the player from the game I need to destroy the boject
-                   
-                    startGame = false;
-
                     enemyBullets.RemoveAt(i);
 
-                    clear();
-                    spon();
+                    //removing a life from the player
+                    player.Lifes -= 1;
+
+                    //Update the textbox
+                    txtLife.Text = "Lifes " + player.Lifes;
+
+                    //If the player dies clear everything and reset the game
+                    if (player.Lifes <= 0)
+                    {
+                        startGame = false;
+
+                        clear();
+                        spon();
+
+                    }
                     return;
                 }
                 
@@ -307,8 +311,6 @@ namespace plane
                 }
             }
 
-
-
             //Move the enemy to the right and appear from the left. + go down at the end of the rotation
             for (int i = 0; i < enemies.Count; i++)
             {   
@@ -316,7 +318,7 @@ namespace plane
 
                 if (moveDirection)
                 {
-                    if (i == 0 && x > 1000)
+                    if (i == 0 && x > 800)
                     {
                         moveDirection = !moveDirection;
                         plus = -plus;
@@ -336,13 +338,12 @@ namespace plane
                 }
 
                 if(moveDown) {
-                    Canvas.SetTop(enemies[i].getRectangle(), Canvas.GetTop(enemies[i].getRectangle()) + 5);
+                    Canvas.SetTop(enemies[i].getRectangle(), Canvas.GetTop(enemies[i].getRectangle()) + 10);
                 }
 
                 if(i == enemies.Count - 1) {
                     moveDown = false;
                 }
-
 
                 /*if(y + plus > 1200 - enemies[i].getRectangle().ActualWidth) {
                     Canvas.SetLeft(enemies[i].getRectangle(), 0);
@@ -355,7 +356,6 @@ namespace plane
             if (stopwatch.ElapsedMilliseconds > 500)
             {
                 Bullet enemyBullet = new Bullet("enemy_bullet", 20, 5, new SolidColorBrush(Colors.White), new SolidColorBrush(Colors.Red));
-                
 
                 Random rnd = new Random();
                 int random = rnd.Next(0, enemies.Count);
@@ -370,14 +370,15 @@ namespace plane
                     stopwatch.Restart();
                 }
             }
-
-
         }
 
         // Making the enemy
         private void spon()
         {
+            canvas.Children.Clear();
+
             stopwatch = new Stopwatch();
+            playerStopWatch = new Stopwatch();
             ImageBrush playerSkin = new ImageBrush();
             playerSkin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/space.png"));
             player = new Player("player", 80, 80, playerSkin, new SolidColorBrush(Colors.Black));
@@ -385,39 +386,51 @@ namespace plane
             addGameObject(player);
             txtScore = new TextBlock();
 
+            //Setting the player lifes
+            player.Lifes = 2;
+
+            //text box for lifes count
+            txtLife = new TextBlock();
+            txtLife.Text = "Lifes " + player.Lifes;
+            Canvas.SetLeft(txtLife, 20);
+            Canvas.SetTop(txtLife, 20);
+            canvas.Children.Add(txtLife);
+
+            //Posstioning the textbox and adding it to the canvas
             Canvas.SetLeft(txtScore,20);
             Canvas.SetTop(txtScore,20);
             canvas.Children.Add(txtScore);
 
             txtScore.Text = "SCORE ";
+            txtScore.Foreground = new SolidColorBrush(Colors.Green);    
             txtScore.FontSize = 30;
-            
+            //Start the cooldown for the player's bullets
+            playerStopWatch.Start();
 
             int left = 800;
-
-            for (int i = 0; i < 10; i++)
+            int up = 10;
+            // Invanders spwan
+            for (int i = 1; i < 41; ++i)
             {
                 ImageBrush skin = new ImageBrush();
                 skin.ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/invader.png"));
 
-                /*Rectangle enemy = new Rectangle
-                {
-                    Tag = "enemy",
-                    Height = 45,
-                    Width = 45,
-                    Fill = skin,
-                };*/
-
                 Enemy enemy = new Enemy("enemy", 45, 45, skin, new SolidColorBrush(Colors.Black));
                 enemies.Add(enemy);
 
-                Canvas.SetTop(enemy.getRectangle(), 10);
+                Canvas.SetTop(enemy.getRectangle(), up);
                 Canvas.SetLeft(enemy.getRectangle(), left);
 
                 canvas.Children.Add(enemy.getRectangle());
 
                 left -= 60;
 
+                // Each 10 enemies make a new line of the them
+                if (i % 10 == 0)
+                {
+                    left = 800;
+                    up += 50;
+                }
             }
         }
 
@@ -433,6 +446,15 @@ namespace plane
             enemyBullets.Clear();
             bullets.Clear();
             score = 0;
+
+            TextBlock txtGameover = new TextBlock();
+            txtGameover.Text = "Game Over!";
+            txtGameover.FontFamily = new FontFamily("Courier New");
+            txtGameover.FontSize = 90;
+            Canvas.SetLeft(txtGameover, 400);
+            Canvas.SetTop(txtGameover, 300);
+            canvas.Children.Add(txtGameover);
+
         }
 
         //Check if there is a collision
