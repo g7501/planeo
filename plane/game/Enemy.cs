@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media;
 
-namespace plane.game
+namespace plane
 {
     internal class Enemy : GameObject
     {

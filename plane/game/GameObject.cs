@@ -9,7 +9,7 @@ using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Controls;
 
-namespace plane.game
+namespace plane
 {
     class GameObject
     {

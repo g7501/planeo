@@ -23,7 +23,6 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Drawing;
 using Windows.UI.Xaml.Shapes;
 using Rectangle = Windows.UI.Xaml.Shapes.Rectangle;
-using plane.game;
 using System.Diagnostics;
 
 
@@ -60,7 +59,10 @@ namespace plane
         bool startGame;
         //Score of the game
         int score = 0;
-        
+
+        //Classes
+        Collision c;
+
 
 
         // Problems
@@ -132,18 +134,18 @@ namespace plane
         //This mothod will call the UpdateKeyState everytime a key got pressed
         private void KeyEventHandler(CoreWindow sender, KeyEventArgs args)
         { 
-            UpdateKeyState();
+            UpdateKeyState(VirtualKey.V);
         }
         //This mothod have all keys
-        private void UpdateKeyState()
+        private void UpdateKeyState(VirtualKey vk)
         {
+            //idea to make to code shorter!
+            var state = Window.Current.CoreWindow.GetKeyState(vk);
             //if enter is pressed
             if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.Enter) &
-                 Windows.UI.Core.CoreVirtualKeyStates.Down)
-                 == CoreVirtualKeyStates.Down)
+                CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
             {
                 startGame = true;
-                
             }
 
             //Key A is down
@@ -166,17 +168,7 @@ namespace plane
             {
                 d = true;
 
-                ContentDialog noWifiDialog = new ContentDialog()
-                {
-                    Title = "No wifi connection",
-                    Content = "Check connection and try again.",
-                    CloseButtonText = "Ok"
-                };
-
-                canvas.Children.Add(noWifiDialog);
-
-                //Key D is Up
-            }
+            } //Key D is Up
             else if ((Window.Current.CoreWindow.GetKeyState(VirtualKey.D) &
                 Windows.UI.Core.CoreVirtualKeyStates.None)
                 == CoreVirtualKeyStates.None)
@@ -249,13 +241,13 @@ namespace plane
             {
                 Canvas.SetLeft(player.getRectangle(), Canvas.GetLeft(player.getRectangle()) + player.getSpeed());
             }
-
+            
             //Ememies interaction with player bullet
             for (int i = 0; i < bullets.Count; i++)
             {
                 for (int y = 0; y < enemies.Count; y++)
                 {       // Removimg the enemy & the bullet on the collison
-                        if (checkCollision(bullets[i].getRectangle(), enemies[y].getRectangle()))
+                        if (c.check(bullets[i].getRectangle(), enemies[y].getRectangle()))
                         {
                             canvas.Children.Remove(enemies[y].getRectangle());
                             canvas.Children.Remove(bullets[i].getRectangle());
@@ -280,7 +272,7 @@ namespace plane
             for (int i = 0; i < enemyBullets.Count; i++)
             {
                 // Removimg the player & the bullet on the collison (I made this because if the player have more lifes...)
-                if (checkCollision(enemyBullets[i].getRectangle(), player.getRectangle()))
+                if (c.check(enemyBullets[i].getRectangle(), player.getRectangle()))
                 {
                     canvas.Children.Remove(enemyBullets[i].getRectangle());
                     enemyBullets.RemoveAt(i);
@@ -386,6 +378,9 @@ namespace plane
             addGameObject(player);
             txtScore = new TextBlock();
 
+            //Class
+            c = new Collision();
+
             //Setting the player lifes
             player.Lifes = 2;
 
@@ -443,6 +438,7 @@ namespace plane
             txtScore = null;
             player = null;
             enemies.Clear();
+            c = null;
             enemyBullets.Clear();
             bullets.Clear();
             score = 0;
@@ -454,20 +450,6 @@ namespace plane
             Canvas.SetLeft(txtGameover, 400);
             Canvas.SetTop(txtGameover, 300);
             canvas.Children.Add(txtGameover);
-
-        }
-
-        //Check if there is a collision
-        public static bool checkCollision(Rectangle e1, Rectangle e2)
-        {
-            var r1 = e1.ActualWidth / 2;
-            var x1 = Canvas.GetLeft(e1) + r1;
-            var y1 = Canvas.GetTop(e1) + r1;
-            var r2 = e2.ActualWidth / 2;
-            var x2 = Canvas.GetLeft(e2) + r2;
-            var y2 = Canvas.GetTop(e2) + r2;
-            var d = new Vector2((float)(x2 - x1), (float)(y2 - y1));
-            return d.Length() <= r1 + r2;
         }
     }
 }

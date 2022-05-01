@@ -120,6 +120,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="game\Bullet.cs" />
+    <Compile Include="game\Collision.cs" />
     <Compile Include="game\Enemy.cs" />
     <Compile Include="game\GameObject.cs" />
     <Compile Include="game\Player.cs" />
