@@ -32,7 +32,7 @@ using System.Diagnostics;
 namespace plane
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// An empty page that can be used on its own or navigated to within a Frame
     /// </summary>
     public sealed partial class MainPage : Page
     {
@@ -98,6 +98,7 @@ namespace plane
             -Maybe add another life for the player.
             -No music/sound.
             -Sometimes the enemies will go off svreen when the user kill some of them.
+            -Bullets will stop shotting somtimes if the plane doesn't move. (I thing it's because press on key update)
        
         Good
             Bullets shape and colourss
